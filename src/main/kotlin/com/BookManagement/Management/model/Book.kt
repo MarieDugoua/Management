@@ -29,12 +29,6 @@ class Book(
 
 
 /*
-TP : Gestion de livre : Partie métier (3/6)
-
-Définir des tests de propriétés
-
-Exemple de propriété :
-La liste des livres retournés contient tous les éléments de la liste stockée
 
 TP : Gestion de livre : Partie métier (4/6)
 
