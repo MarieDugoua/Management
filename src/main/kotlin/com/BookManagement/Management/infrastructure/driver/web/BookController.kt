@@ -25,4 +25,10 @@ class BookController(
         bookUseCase.addBook(bookDTO.toDomain())
     }
 
+    @CrossOrigin
+    @PostMapping("/{bookId}/reserve")
+    @ResponseStatus(HttpStatus.OK)
+    fun reserveBook(@PathVariable bookId: Int) {
+        bookUseCase.reserveBook(bookId)
+    }
 }

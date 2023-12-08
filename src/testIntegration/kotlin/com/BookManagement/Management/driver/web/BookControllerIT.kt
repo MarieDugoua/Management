@@ -3,9 +3,7 @@ package com.BookManagement.Management.driver.web
 import com.BookManagement.Management.domain.model.Book
 import com.BookManagement.Management.domain.usecase.BookUseCase
 import com.ninjasquad.springmockk.MockkBean
-import io.mockk.every
-import io.mockk.justRun
-import io.mockk.verify
+import io.mockk.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -29,7 +27,7 @@ class BookControllerIT {
     @Test
     fun `rest route get books`() {
         // GIVEN
-        every { bookUseCase.getAllBooks() } returns listOf(Book("A", "B"))
+        every { bookUseCase.getAllBooks() } returns listOf(Book("A", "B", false))
 
         // WHEN
         mockMvc.get("/books")
@@ -43,7 +41,8 @@ class BookControllerIT {
                         [
                           {
                             "name": "A",
-                            "author": "B"
+                            "author": "B",
+                            "reserved": false
                           }
                         ]
                     """.trimIndent()
@@ -60,7 +59,8 @@ class BookControllerIT {
             content = """
                 {
                   "name": "Les misérables",
-                  "author": "Victor Hugo"
+                  "author": "Victor Hugo",
+                  "reserved": false
                 }
             """.trimIndent()
             contentType = APPLICATION_JSON
@@ -71,7 +71,8 @@ class BookControllerIT {
 
         val expected = Book(
             name = "Les misérables",
-            author = "Victor Hugo"
+            author = "Victor Hugo",
+            reserved = false
         )
 
         verify(exactly = 1) { bookUseCase.addBook(expected) }
@@ -86,7 +87,8 @@ class BookControllerIT {
             content = """
                 {
                   "title": "Les misérables",
-                  "author": "Victor Hugo"
+                  "author": "Victor Hugo",
+                  "reserved": false
                 }
             """.trimIndent()
             contentType = APPLICATION_JSON
@@ -96,5 +98,27 @@ class BookControllerIT {
         }
 
         verify(exactly = 0) { bookUseCase.addBook(any()) }
+    }
+
+    @Test
+    fun `reserveBook endpoint return 200 when book is reserved`() {
+        val bookId = 1
+        every { bookUseCase.reserveBook(bookId) } just Runs
+
+        mockMvc.post("/books/$bookId/reserve")
+            .andExpect {
+                status { isOk() }
+            }
+    }
+
+    @Test
+    fun `reserveBook endpoint should return 400 when book is already reserved`() {
+        val bookId = 1
+        every { bookUseCase.reserveBook(bookId) } throws IllegalStateException("Reservation was unsuccessful")
+
+        mockMvc.post("/books/$bookId/reserve")
+            .andExpect {
+                status { isBadRequest() }
+            }
     }
 }

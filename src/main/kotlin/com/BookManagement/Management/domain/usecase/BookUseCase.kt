@@ -15,4 +15,10 @@ class BookUseCase(
     fun addBook(book: Book) {
         bookPort.createBook(book)
     }
+
+    fun reserveBook(bookId: Int) {
+        val book = bookPort.getBookById(bookId)
+        if (book.reserved) throw IllegalStateException("Book already reserved")
+        bookPort.updateBookReservation(bookId, true)
+    }
 }

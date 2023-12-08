@@ -35,8 +35,8 @@ class BookDTOUseCaseTest {
     fun `get all books should returns all books sorted by name`() {
         // Arrange
         every { bookPort.getAllBooks() } returns listOf(
-            Book("Les Misérables", "Victor Hugo"),
-            Book("Hamlet", "William Shakespeare")
+            Book("Les Misérables", "Victor Hugo", false),
+            Book("Hamlet", "William Shakespeare", false)
         )
 
         // Act
@@ -44,8 +44,8 @@ class BookDTOUseCaseTest {
 
         // Assert
         assertThat(res).containsExactly(
-            Book("Hamlet", "William Shakespeare"),
-            Book("Les Misérables", "Victor Hugo")
+            Book("Hamlet", "William Shakespeare", false),
+            Book("Les Misérables", "Victor Hugo", false)
         )
     }
 
@@ -53,7 +53,7 @@ class BookDTOUseCaseTest {
     fun `add book`() {
         justRun { bookPort.createBook(any()) }
 
-        val book = Book("Les Misérables", "Victor Hugo")
+        val book = Book("Les Misérables", "Victor Hugo", false)
 
         bookUseCase.addBook(book)
 
@@ -80,8 +80,8 @@ class BookDTOUseCaseTest {
     fun bookGenerator(): Arbitrary<List<Book>> {
         return combine(
             String.any().ofMinLength(1).ofMaxLength(20).alpha(),
-            String.any().ofMinLength(1).ofMaxLength(20).alpha()).`as` { title: String, author: String ->
-            Book(title, author)
+            String.any().ofMinLength(1).ofMaxLength(20).alpha(), Boolean.any()).`as` { title: String, author: String, reserved: Boolean ->
+            Book(title, author, reserved)
         }.list().uniqueElements().ofSize(10)
     }
 }
