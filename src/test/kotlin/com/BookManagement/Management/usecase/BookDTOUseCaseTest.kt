@@ -21,13 +21,13 @@ import net.jqwik.api.Provide
 import net.jqwik.api.lifecycle.BeforeProperty
 import net.jqwik.kotlin.api.any
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 @ExtendWith(MockKExtension::class)
 class BookDTOUseCaseTest {
 
     @InjectMockKs
     private lateinit var bookUseCase: BookUseCase
-
     @MockK
     private lateinit var bookPort: BookPort
 
@@ -58,6 +58,27 @@ class BookDTOUseCaseTest {
         bookUseCase.addBook(book)
 
         verify(exactly = 1) { bookPort.createBook(book) }
+    }
+
+    @Test
+    fun `reserveBook should call updateBookReservation with true`() {
+        val bookId = 1
+        val book = Book("Les Misérables", "Victor Hugo", false)
+        every { bookPort.getBookById(bookId) } returns book
+        justRun { bookPort.updateBookReservation(bookId, true) }
+
+        bookUseCase.reserveBook(bookId)
+
+        verify(exactly = 1) { bookPort.updateBookReservation(bookId, true) }
+    }
+
+    @Test
+    fun `reserveBook should throw IllegalStateException when book is already reserved`() {
+        val bookId = 1
+        val book = Book("Les Misérables", "Victor Hugo", true)
+        every { bookPort.getBookById(bookId) } returns book
+
+        assertThrows<IllegalStateException> { bookUseCase.reserveBook(bookId) }
     }
 
     @BeforeProperty

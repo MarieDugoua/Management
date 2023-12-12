@@ -20,7 +20,6 @@ class BookControllerIT {
 
     @MockkBean
     private lateinit var bookUseCase: BookUseCase
-
     @Autowired
     lateinit var mockMvc: MockMvc
 
@@ -75,6 +74,7 @@ class BookControllerIT {
             reserved = false
         )
 
+        verify(exactly = 1) { bookUseCase.addBook(expected) }
         verify(exactly = 1) { bookUseCase.addBook(expected) }
     }
 
