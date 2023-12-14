@@ -84,6 +84,20 @@ class BookDAOIT {
         assertThat(res[0]["reserved"]).isEqualTo(false)
     }
 
+    @Test
+    fun `Update a reservation on a book`() {
+        bookDAO.createBook(Book("Les misérables", "Victor Hugo", false))
+
+        bookDAO.updateBookReservation(1, true)
+
+        val res = performQuery(
+            // language=sql
+            "SELECT * WHERE id = 0 from book"
+        )
+
+        assertThat(res[0]["reserved"]).isEqualTo(true)
+    }
+
     protected fun performQuery(sql: String): List<Map<String, Any>> {
         val hikariConfig = HikariConfig()
         hikariConfig.setJdbcUrl(postgresqlContainer.jdbcUrl)

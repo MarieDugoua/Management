@@ -3,6 +3,7 @@ package com.BookManagement.Management.usecase
 import assertk.assertThat
 import assertk.assertions.containsExactly
 import assertk.assertions.containsExactlyInAnyOrder
+import assertk.assertions.isEqualTo
 import com.BookManagement.Management.domain.model.Book
 import com.BookManagement.Management.domain.port.BookPort
 import com.BookManagement.Management.domain.usecase.BookUseCase
@@ -30,6 +31,7 @@ class BookDTOUseCaseTest {
     private lateinit var bookUseCase: BookUseCase
     @MockK
     private lateinit var bookPort: BookPort
+    private val bookList = mutableListOf<Book>()
 
     @Test
     fun `get all books should returns all books sorted by name`() {
@@ -58,6 +60,19 @@ class BookDTOUseCaseTest {
         bookUseCase.addBook(book)
 
         verify(exactly = 1) { bookPort.createBook(book) }
+    }
+
+    @Test
+    fun `reserveBook a new book should be false`() {
+        justRun { bookPort.createBook(any())}
+
+        val book = Book("De Verre et de cendre", "Reina dolce", false)
+
+        bookUseCase.addBook(book)
+
+        // Assert
+        val lastBook = bookList.last()
+        assertThat(lastBook.reserved).isEqualTo(false)
     }
 
     @Test

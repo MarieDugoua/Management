@@ -83,8 +83,22 @@ fun reserveBook(bookId: Int) {
 
 #### Développer des Tests Unitaires :
 
-- Créez une classe de test unitaire spécifique pour la fonctionnalité de réservation de livre.
-- Écrivez des tests pour vérifier différents scénarios, par exemple :
+  - Un nouveau livre et non reserver a sont ajout a la db
+    ````kt
+    @Test
+    fun `reserveBook a new book should be false`() {
+        justRun { bookPort.createBook(any())}
+
+        val book = Book("De Verre et de cendre", "Reina dolce", false)
+
+        bookUseCase.addBook(book)
+
+        // Assert
+        val lastBook = bookList.last()
+        assertThat(lastBook.reserved).isEqualTo(false)
+    }
+    ````
+
   - Réserver un livre qui n'est pas encore réservé.
     ````kt
     @Test
@@ -110,9 +124,3 @@ fun reserveBook(bookId: Int) {
         assertThrows<IllegalStateException> { bookUseCase.reserveBook(bookId) }
     }
     ````
-
-#### Développer des Tests d'Intégration :
-- Créez des tests d'intégration spécifiques à la réservation de livre. Ces tests devraient simuler des requêtes REST pour réserver un livre, en utilisant par exemple RestTemplate ou un client HTTP.
-
-#### Validez la Fonctionnalité :
-- Testez manuellement la réservation de livre en utilisant l'interface utilisateur ou les requêtes REST pour vous assurer que tout fonctionne comme prévu.
